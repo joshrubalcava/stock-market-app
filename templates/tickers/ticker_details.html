@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %} {{ticker.ticker}} {% endblock %}
+
+{% block content %}
+  <div class="mt-4 container d-flex flex-column align-items-center">
+    <h1>{{ticker.name}} ({{ticker.ticker}}) - {{ticker.exchange}}</h1>
+    <div class="card">
+      <div class="card-body">
+        {% for details in ticker_details %}
+          <p>{{ticker_details.open}}</p>
+          <p>{{ticker_details.close}}</p>
+          <p>{{ticker_details.high}}</p>
+          <p>{{ticker_details.low}}</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %} {{user.username}} {% endblock %}
+
+{% block content %}
+  <div class="container d-flex flex-column align-items-center">
+    <div class="m-3 d-flex flex-column align-items-center">
+      <img src="{{user.image_url}}" alt="user-profile-picture" class="mb-3 img-thumbnail">
+    </div>
+    <h1>{{user.first_name.capitalize()}} {{user.last_name.capitalize()}}</h1>
+    <p>Username: {{user.username}}</p>
+    <p>Email: {{user.email}}</p>
+    <div class="d-flex justify-content-center">
+      <a href="/users/{{user.id}}/edit" class="me-3 btn btn-primary">Edit User Details</a>
+      <a href="/" class="btn btn-danger">Back</a>
+    </div>
+  </div>
+{% endblock %}

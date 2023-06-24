@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %} Stock Market App {% endblock %}
+
+{% block content %}
+  <div class=" mt-4 container d-flex justify-content-center flex-wrap">
+    {% for index in indices %}
+      <div class="mb-3 mx-3 card text-center" style="width: 20rem;">
+        {% if index.close|float() > index.open|float() %}
+          <div class="card-header bg-success text-light">{{index.name}}</div>
+        {% elif index.close|float() < index.open|float() %}
+          <div class="card-header bg-danger text-light">{{index.name}}</div>
+        {% else %}
+          <div class="card-header bg-danger">{{index.name}}</div>
+        {% endif %}
+        <ul class="list-group list-group-horizontal h-50">
+          <li class="list-group-item w-50">High: ${{index.high}}</li>
+          <li class="list-group-item w-50">Low: ${{index.low}}</li>
+        </ul>
+        <ul class="list-group list-group-horizontal h-50">
+          <li class="list-group-item w-50">Open: ${{index.open}}</li>
+          <li class="list-group-item w-50">Close: ${{index.close}}</li>
+        </ul>
+      </div>
+    {% endfor %}
+  </div> 
+  <div class="mt-4 container">
+    <div class="row row-cols-1 row-cols-md-3 g-2 justify-content-center">
+      {% for article in news %}
+        <div class="mb-3 mx-3 card text-center" style="width: 20rem;">
+          <div class="card-header bg-dark text-light">{{article.title}}</div>
+          <div class="card-body">
+            <blockquote class="blockquote mb-0">
+              <p>{{article.summary}}</p>
+              {% if article.authors|length == 0 %}
+                <footer class="blockquote-footer">Written By: Anonymous</footer>
+              {% elif article.authors|length >= 1 %}
+                <footer class="blockquote-footer">
+                  Written By:
+                  {% for author in article.authors %}
+                    {% if author == article.authors|last %}
+                      {{author.title()}}
+                    {% else %}
+                      {{author.title(), }}
+                    {% endif %}
+                  {% endfor %}
+                </footer>
+              {% endif %}
+            </blockquote>
+            <a href="{{article.url}}" class="mt-2 btn btn-primary">Go to Article</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}
