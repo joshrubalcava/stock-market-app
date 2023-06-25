@@ -1,3 +1,7 @@
+"""SQLAlchemy models for Stock Market."""
+
+from datetime import datetime
+
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 
@@ -30,6 +34,8 @@ class User(db.Model):
     password = db.Column(db.Text, nullable=False)
 
     image_url = db.Column(db.Text, default='/static/images/default-pic.png')
+
+    post = db.Relationship('Post', cascade="all, delete-orphan", backref='user')
 
     def __repr__(self):
         u = self
@@ -76,19 +82,28 @@ class User(db.Model):
         return False
 
 
-class Watchlist(db.Model):
-    """ Table for user watchlists """
+class Post(db.Model):
+    """ Table for user posts """
 
-    __tablename__ = 'watchlists'
+    __tablename__ = 'posts'
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
-    ticker_symbol = db.Column(db.Text, db.ForeignKey('tickers.ticker'))
+    content = db.Column(db.Text, nullable=False)
+
+    timestamp = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow(),
+    )
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'))
+
+    ticker = db.Column(db.Text, db.ForeignKey('tickers.ticker', ondelete='cascade'))
 
     def __repr__(self):
         u = self
-        return f'<WatchList user_id={u.user_id} ticker_symbol={u.ticker_symbol}'
-
+        return f'<Post id={u.id} content={u.content} timestamp={u.timestamp} user_id={u.user_id} ticker={u.ticker}'
 
 class Ticker(db.Model):
     """ Table for US Ticker Symbols """
@@ -101,8 +116,8 @@ class Ticker(db.Model):
 
     exchange = db.Column(db.Text, nullable=False)
 
-    watchlist = db.relationship('User', secondary='watchlists', backref='tickers')
+    post = db.Relationship('Post', cascade="all, delete-orphan", backref='tickers')
 
     def __repr__(self):
         u = self
-        return f'<Ticker ticker={u.ticker} name={u.name}, primary_exchange={u.primary_exchange}'
+        return f'<Ticker ticker={u.ticker} name={u.name}, primary_exchange={u.exchange}'

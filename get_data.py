@@ -82,6 +82,42 @@ def get_news_articles():
 
   return news
 
+def get_news_for_ticker(ticker):
+  """ Gets news articles that include the ticker symbol """
+
+  url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={ticker}&sort=RELEVANCE&limit=20&apikey={AV_KEY}'
+
+  news = []
+
+  resp = requests.get(url)
+
+  data = resp.json()
+
+  feed = data['feed']
+
+  for article in feed:
+    title = article['title']
+    url = article['url']
+    authors = article['authors']
+    summary = article['summary']
+    banner_img = article['banner_image']
+    source = article['source']
+    topics = article['topics']
+    overall_sentiment = article['overall_sentiment_label']
+
+    news.append({
+      'title': title,
+      'url': url,
+      'authors': authors,
+      'summary': summary,
+      'banner_img': banner_img,
+      'source': source,
+      'topics': topics,
+      'overall_sentiment': overall_sentiment
+    })
+
+  return news
+
 def get_tickers():
   """ Get ticker symbols in the US """
 
@@ -109,7 +145,7 @@ def get_tickers():
 def get_ticker_details(ticker):
   """ Get data on individual tickers for ticker details page """
 
-  ticker_url = f'https://api.twelvedata.com/time_series?symbol={ticker}&apikey={TD_KEY}'
+  ticker_url = f'https://api.twelvedata.com/time_series?symbol={ticker}&interval=1day&apikey={TD_KEY}'
 
   five_day_data = []
 

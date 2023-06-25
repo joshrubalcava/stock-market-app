@@ -1,9 +1,9 @@
 from flask import Flask, session, render_template, redirect, g, flash, request
 from flask_debugtoolbar import DebugToolbarExtension
-from models import db, connect_db, User, Ticker
-from forms import UserAddForm, UserLoginForm, EditUserForm
+from models import db, connect_db, User, Ticker, Post
+from forms import UserAddForm, UserLoginForm, EditUserForm, AddPost, EditPost
 from sqlalchemy.exc import IntegrityError
-from get_data import get_main_indices, get_news_articles, get_ticker_details
+from get_data import get_main_indices, get_news_articles, get_ticker_details, get_news_for_ticker
 
 CURR_USER_KEY = "curr_user"
 
@@ -91,6 +91,7 @@ def user_sign_up():
             return render_template('/users/signup.html', form=form)
 
         do_login(user)
+        flash(f'Hello {user.first_name}!')
 
         return redirect('/')
     else:
@@ -135,13 +136,22 @@ def user_show(user_id):
 
     user = User.query.get_or_404(user_id)
 
-    return render_template('users/show.html', user=user)
+    if Post.query.filter_by(user_id=user_id).first() == None:
+        posts = None
+    else: 
+        posts = Post.query.filter_by(user_id=user_id)
+
+    return render_template('users/show.html', user=user, posts=posts)
 
 
 
 @app.route('/users/<int:user_id>/edit', methods=['GET', 'POST'])
 def edit_user(user_id):
     """ Edit user information """
+
+    if g.user.id != user_id:
+        flash('Unauthorized Access', 'danger')
+        return redirect('/')
 
     user = User.query.get_or_404(user_id)
     form = EditUserForm(obj=user)
@@ -159,6 +169,23 @@ def edit_user(user_id):
         return render_template('users/edit.html', form=form, user=user)
 
 
+@app.route('/users/<int:user_id>/delete', methods=['POST'])
+def delete_user(user_id):
+    """ Delete user account from database """
+
+    user = User.query.get_or_404(user_id)
+
+    db.session.query(Post).filter(Post.user_id==user_id).delete()
+    db.session.commit()
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return redirect('/signup')
+
+
+##############################################################################
+# General ticker routes:
 
 @app.route('/tickers/search')
 def show_stock_list():
@@ -177,7 +204,82 @@ def ticker_details(ticker_name):
     """ Shows information about a selected ticker symbol """
 
     ticker = Ticker.query.get_or_404(ticker_name)
+    
+    if Post.query.filter_by(ticker=ticker.ticker).first() == None:
+        posts = None
+    else:
+        posts = Post.query.filter_by(ticker=ticker.ticker).order_by(Post.timestamp.desc())
 
     ticker_details = get_ticker_details(ticker_name)
 
-    return render_template('tickers/ticker_details.html', ticker=ticker, ticker_details=ticker_details)
+    ticker_news = get_news_for_ticker(ticker.ticker)
+
+    return render_template('tickers/ticker_details.html', ticker=ticker, ticker_details=ticker_details, news=ticker_news, posts=posts)
+
+
+
+@app.route('/tickers/<ticker_name>/post/add', methods=['GET', 'POST'])
+def add_post(ticker_name):
+    """ Form to submit a new post for a ticker """
+
+    form = AddPost()
+    ticker = Ticker.query.get_or_404(ticker_name)
+
+    if form.validate_on_submit():
+        try:
+            new_post = Post(
+                content = form.content.data,
+                user_id = g.user.id,
+                ticker = ticker_name
+            )
+            db.session.add(new_post)
+            db.session.commit()
+
+            return redirect(f'/tickers/{ticker_name}')
+        except AttributeError:
+            flash('Please login to add a new post', 'warning')
+            return redirect('/login')
+    else:
+        return render_template('/tickers/new_post.html', form=form, ticker=ticker)
+
+
+@app.route('/tickers/<ticker_name>/post/<int:post_id>/edit', methods=['GET', 'POST'])
+def edit_post(ticker_name, post_id):
+    """ Handles the user editing a post """
+
+    ticker = Ticker.query.get_or_404(ticker_name)
+    post = Post.query.get_or_404(post_id)
+
+    form = EditPost(obj=post)
+
+    if g.user.id != post.user_id:
+        flash('Unauthorized Access', 'danger')
+        return redirect(f'/tickers/{ticker_name}')
+
+    if form.validate_on_submit():
+        try:
+            post.content = form.content.data
+            db.session.commit()
+
+            return redirect(f'/tickers/{ticker_name}')
+        except AttributeError:
+            flash('Please login to add a new post', 'warning')
+            return redirect('/login')
+    else:
+        return render_template('/tickers/edit_post.html', form=form, ticker=ticker)
+
+
+@app.route('/tickers/<ticker_name>/post/<int:post_id>/delete', methods=['POST'])
+def delete_post(ticker_name, post_id):
+    """ Handles deleting a user post """
+
+    post = Post.query.get_or_404(post_id)
+
+    if g.user.id != post.user_id:
+        flash('Unauthorized Access')
+        return redirect(f'/tickers/{ticker_name}')
+
+    db.session.delete(post)
+    db.session.commit()
+
+    return redirect(f'/tickers/{ticker_name}')

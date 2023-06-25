@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
+from wtforms import StringField, PasswordField, TextAreaField
 from wtforms.validators import DataRequired, URL, Email, Optional, Length
 
 class UserAddForm(FlaskForm):
@@ -24,3 +24,13 @@ class EditUserForm(FlaskForm):
   username = StringField(label='Username', validators=[DataRequired()])
   email = StringField(label='Email', validators=[Email()])
   image_url = StringField('Profile Image URL', validators=[Optional(), URL()])
+
+class AddPost(FlaskForm):
+  """ Form for adding new posts for tickers """
+
+  content = TextAreaField('Content', validators=[Length(min=10)])
+
+class EditPost(FlaskForm):
+  """ Edit Post """
+
+  content = TextAreaField('Enter new post', validators=[Length(min=10)])

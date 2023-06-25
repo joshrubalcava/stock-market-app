@@ -5,14 +5,85 @@
 {% block content %}
   <div class="mt-4 container d-flex flex-column align-items-center">
     <h1>{{ticker.name}} ({{ticker.ticker}}) - {{ticker.exchange}}</h1>
-    <div class="card">
-      <div class="card-body">
-        {% for details in ticker_details %}
-          <p>{{ticker_details.open}}</p>
-          <p>{{ticker_details.close}}</p>
-          <p>{{ticker_details.high}}</p>
-          <p>{{ticker_details.low}}</p>
-        {% endfor %}
+    <div class="mt-4 container d-flex justify-content-center">
+    {% for details in ticker_details %}
+      <div class="card">
+        <div class="card-body">
+          <div class="date">
+            <h5>{{details.datetime}}</h5>
+            <div class="open-close">
+              <p>Open: ${{details.open|float|round(2)}}</p>
+              <p>Close: ${{details.close|float|round(2)}}</p>
+            </div>
+            <div class="high-low">
+              <p>High: ${{details.high|float|round(2)}}</p>
+              <p>Low: ${{details.low|float|round(2)}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+    </div>
+    <div class="mt-4 container text-center">
+      <div class="row">
+        {% if posts %}
+          <div class="col-4">
+            <h3 class="mb-4">Posts</h3>
+            <a href="/tickers/{{ticker.ticker}}/post/add" class="mb-4 btn btn-info">Add New Post</a>
+            {% for post in posts %}
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title"><a href="" class="text-dark">{{post.user.username}}</a></h5>
+                  <h6 class="card-subtitle"><a href="">{{post.ticker}}</a></h6>
+                  <p>{{post.content}}</p>
+                  {% if g.user.id == post.user_id %}
+                    <form action="/tickers/{{post.ticker}}/post/{{post.id}}/delete" method="POST">
+                      <a href="/tickers/{{ticker.ticker}}/post/{{post.id}}/edit" class="btn btn-primary">Edit Post</a>
+                      <button class="btn btn-danger">Delete Post</button>
+                    </form>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="col-4">
+            <p>No Posts Yet.</p>
+            <a href="/tickers/{{ticker.ticker}}/post/add" class="btn btn-info">Add Post</a>
+          </div>
+        {% endif %}
+        <div class="col-8">
+          <h3>News</h3>
+          <div class="mt-4 container">
+            <div class="row row-cols-1 row-cols-md-3 g-2 justify-content-center">
+              {% for article in news %}
+                <div class="mb-3 mx-3 card text-center" style="width: 20rem;">
+                  <div class="card-header bg-dark text-light">{{article.title}}</div>
+                  <div class="card-body">
+                    <blockquote class="blockquote mb-0">
+                      <p>{{article.summary}}</p>
+                      {% if article.authors|length == 0 %}
+                        <footer class="blockquote-footer">Written By: Anonymous</footer>
+                      {% elif article.authors|length >= 1 %}
+                        <footer class="blockquote-footer">
+                          Written By:
+                          {% for author in article.authors %}
+                            {% if author == article.authors|last %}
+                              {{author.title()}}
+                            {% else %}
+                              {{author.title(), }}
+                            {% endif %}
+                          {% endfor %}
+                        </footer>
+                      {% endif %}
+                    </blockquote>
+                    <a href="{{article.url}}" class="mt-2 btn btn-primary">Go to Article</a>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
