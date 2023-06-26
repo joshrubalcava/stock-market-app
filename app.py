@@ -1,6 +1,6 @@
 from flask import Flask, session, render_template, redirect, g, flash, request
 from flask_debugtoolbar import DebugToolbarExtension
-from models import db, connect_db, User, Ticker, Post
+from models import db, connect_db, User, Ticker, Post, Watchlist, UserWatchlist
 from forms import UserAddForm, UserLoginForm, EditUserForm, AddPost, EditPost
 from sqlalchemy.exc import IntegrityError
 from get_data import get_main_indices, get_news_articles, get_ticker_details, get_news_for_ticker
@@ -57,7 +57,13 @@ def show_home_page():
 
     news = get_news_articles()
 
-    return render_template('home.html', indices=indices_data, news=news)
+    if not g.user:
+        watchlists = None
+    else:
+        watchlists = Watchlist.query.filter_by(user_id=g.user.id).all()
+        print(watchlists)
+
+    return render_template('home.html', indices=indices_data, news=news, watchlists=watchlists)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -283,3 +289,7 @@ def delete_post(ticker_name, post_id):
     db.session.commit()
 
     return redirect(f'/tickers/{ticker_name}')
+
+
+##############################################################################
+# General watchlist routes:

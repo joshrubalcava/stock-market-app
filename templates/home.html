@@ -24,7 +24,22 @@
       </div>
     {% endfor %}
   </div> 
+  <div class="">
+    {% if watchlists %}
+      {% for list in watchlists %}
+        <h1>{{list.name}}</h1>
+        <ul>
+          {% for ticker in user_watchlists %}
+            <li>{{ticker.ticker}}</li>
+          {% endfor %}
+        </ul>
+      {% endfor %}
+    {% else %}
+
+    {% endif %}
+  </div>
   <div class="mt-4 container">
+    <h1 class="mb-3 text-center">News Articles</h1>
     <div class="row row-cols-1 row-cols-md-3 g-2 justify-content-center">
       {% for article in news %}
         <div class="mb-3 mx-3 card text-center" style="width: 20rem;">

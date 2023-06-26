@@ -37,6 +37,8 @@ class User(db.Model):
 
     post = db.Relationship('Post', cascade="all, delete-orphan", backref='user')
 
+    watchlist = db.Relationship('Watchlist', cascade="all, delete-orphan", backref='user')
+
     def __repr__(self):
         u = self
         return f'<User id={u.id} first_name={u.first_name} last_name={u.last_name} username={u.username} image_url={u.image_url}'
@@ -105,6 +107,38 @@ class Post(db.Model):
         u = self
         return f'<Post id={u.id} content={u.content} timestamp={u.timestamp} user_id={u.user_id} ticker={u.ticker}'
 
+class Watchlist(db.Model):
+    """ Table for watchlist """
+
+    __tablename__ = 'watchlists'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    name = db.Column(db.Text, nullable=False)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'))
+
+    user_watchlist = db.Relationship('UserWatchlist', cascade="all, delete-orphan", backref='watchlist')
+
+    def __repr__(self):
+        u = self
+        return f'<Watchlist id={u.id} name={u.name}, user_id={u.user_id}'
+
+class UserWatchlist(db.Model):
+    """ Table to link user watchlist with tickers """
+
+    __tablename__ = 'user_watchlists'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    watchlist_id = db.Column(db.Integer, db.ForeignKey('watchlists.id', ondelete='cascade'))
+
+    ticker = db.Column(db.Text, db.ForeignKey('tickers.ticker', ondelete='cascade'))
+
+    def __repr__(self):
+        u = self
+        return f'<UserWatchlist id={u.id} watchlist_id={u.watchlist_id}, ticker={u.ticker}'
+
 class Ticker(db.Model):
     """ Table for US Ticker Symbols """
 
@@ -117,6 +151,8 @@ class Ticker(db.Model):
     exchange = db.Column(db.Text, nullable=False)
 
     post = db.Relationship('Post', cascade="all, delete-orphan", backref='tickers')
+
+    user_watchlist = db.Relationship('UserWatchlist', cascade="all, delete-orphan", backref='tickers')
 
     def __repr__(self):
         u = self
