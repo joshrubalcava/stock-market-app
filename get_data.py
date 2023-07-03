@@ -147,10 +147,29 @@ def get_ticker_details(ticker):
 
   ticker_url = f'https://api.twelvedata.com/time_series?symbol={ticker}&interval=1day&apikey={TD_KEY}'
 
-  five_day_data = []
-
   resp = requests.get(ticker_url)
 
   data = resp.json()
 
   return data['values'][:5]
+
+def get_watchlist_ticker_data(ticker):
+  """ Gets the open, close, high, and low values for watchlists """
+
+  ticker_url = f'https://api.twelvedata.com/time_series?symbol={ticker}&interval=1day&apikey={TD_KEY}'
+
+  resp = requests.get(ticker_url)
+
+  data = resp.json()
+
+  open = str(round(float(data['values'][0]['open']), 2))
+  high = str(round(float(data['values'][0]['high']), 2))
+  low = str(round(float(data['values'][0]['low']), 2))
+  close = str(round(float(data['values'][0]['close']), 2))
+
+  return {
+    'open': open,
+    'close': close,
+    'high': high,
+    'low': low
+  }

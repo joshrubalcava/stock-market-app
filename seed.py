@@ -1,6 +1,6 @@
 from app import app
-from models import User, Ticker, Post, Watchlist, UserWatchlist, db
-from get_data import get_tickers
+from models import User, Ticker, Post, Watchlist, db
+from get_data import get_tickers, get_watchlist_ticker_data
 
 
 db.drop_all()
@@ -32,18 +32,16 @@ post4 = Post(content='Lorem ipsum dolor sit amet consectetur adipisicing elit. O
 db.session.add_all([post1, post2, post3, post4])
 db.session.commit()
 
-watchlist1 = Watchlist(name='Watchlist1', user_id=1)
-watchlist2 = Watchlist(name='Watchlist2', user_id=2)
+apple = get_watchlist_ticker_data('AAPL')
+intel = get_watchlist_ticker_data('INTC')
+tesla = get_watchlist_ticker_data('TSLA')
 
-db.session.add_all([watchlist1, watchlist2])
-db.session.commit()
+watchlist_1 = Watchlist(ticker='AAPL', open=apple['open'], close=apple['low'], high=apple['high'], low=apple['low'], user_id=1)
+watchlist_2 = Watchlist(ticker='INTC', open=intel['open'], close=intel['low'], high=intel['high'], low=intel['low'], user_id=1)
+watchlist_3 = Watchlist(ticker='TSLA', open=tesla['open'], close=tesla['low'], high=tesla['high'], low=tesla['low'], user_id=1)
+watchlist_4 = Watchlist(ticker='AAPL', open=apple['open'], close=apple['low'], high=apple['high'], low=apple['low'], user_id=2)
+watchlist_5 = Watchlist(ticker='INTC', open=intel['open'], close=intel['low'], high=intel['high'], low=intel['low'], user_id=2)
+watchlist_6 = Watchlist(ticker='TSLA', open=tesla['open'], close=tesla['low'], high=tesla['high'], low=tesla['low'], user_id=2)
 
-update_watchlist_1 = UserWatchlist(watchlist_id=1, ticker='AAPL')
-update_watchlist_2 = UserWatchlist(watchlist_id=1, ticker='INTC')
-update_watchlist_3 = UserWatchlist(watchlist_id=1, ticker='TSLA')
-update_watchlist_4 = UserWatchlist(watchlist_id=2, ticker='AAPL')
-update_watchlist_5 = UserWatchlist(watchlist_id=2, ticker='INTC')
-update_watchlist_6 = UserWatchlist(watchlist_id=2, ticker='TSLA')
-
-db.session.add_all([update_watchlist_1, update_watchlist_2, update_watchlist_3, update_watchlist_4, update_watchlist_5, update_watchlist_6])
+db.session.add_all([watchlist_1, watchlist_2, watchlist_3, watchlist_4, watchlist_5, watchlist_6])
 db.session.commit()

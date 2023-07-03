@@ -1,9 +1,9 @@
 from flask import Flask, session, render_template, redirect, g, flash, request
 from flask_debugtoolbar import DebugToolbarExtension
-from models import db, connect_db, User, Ticker, Post, Watchlist, UserWatchlist
-from forms import UserAddForm, UserLoginForm, EditUserForm, AddPost, EditPost
+from models import db, connect_db, User, Ticker, Post, Watchlist
+from forms import UserAddForm, UserLoginForm, EditUserForm, AddPost, EditPost, CreateWatchlist
 from sqlalchemy.exc import IntegrityError
-from get_data import get_main_indices, get_news_articles, get_ticker_details, get_news_for_ticker
+from get_data import get_main_indices, get_news_articles, get_ticker_details, get_news_for_ticker, get_watchlist_ticker_data
 
 CURR_USER_KEY = "curr_user"
 
@@ -57,13 +57,12 @@ def show_home_page():
 
     news = get_news_articles()
 
-    if not g.user:
-        watchlists = None
+    if g.user:
+        watchlist = Watchlist.query.filter_by(user_id=g.user.id)
     else:
-        watchlists = Watchlist.query.filter_by(user_id=g.user.id).all()
-        print(watchlists)
+        watchlist = None
 
-    return render_template('home.html', indices=indices_data, news=news, watchlists=watchlists)
+    return render_template('home.html', indices=indices_data, news=news, watchlist=watchlist)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -140,14 +139,23 @@ def logout():
 def user_show(user_id):
     """ Show User Profile """
 
+    if not g.user.id:
+        flash('Unauthorized Access')
+        return redirect('/')
+
     user = User.query.get_or_404(user_id)
+
+    if Watchlist.query.filter_by(user_id=user_id).first() == None:
+        watchlist = None
+    else:
+        watchlist = Watchlist.query.filter_by(user_id=g.user.id)
 
     if Post.query.filter_by(user_id=user_id).first() == None:
         posts = None
     else: 
         posts = Post.query.filter_by(user_id=user_id)
 
-    return render_template('users/show.html', user=user, posts=posts)
+    return render_template('users/show.html', user=user, posts=posts, watchlist=watchlist)
 
 
 
@@ -155,7 +163,7 @@ def user_show(user_id):
 def edit_user(user_id):
     """ Edit user information """
 
-    if g.user.id != user_id:
+    if not g.user:
         flash('Unauthorized Access', 'danger')
         return redirect('/')
 
@@ -179,6 +187,11 @@ def edit_user(user_id):
 def delete_user(user_id):
     """ Delete user account from database """
 
+    if not g.user:
+        flash('Unauthorized Access')
+        return redirect('/')
+
+
     user = User.query.get_or_404(user_id)
 
     db.session.query(Post).filter(Post.user_id==user_id).delete()
@@ -192,6 +205,15 @@ def delete_user(user_id):
 
 ##############################################################################
 # General ticker routes:
+
+@app.route('/tickers')
+def show_all_tickers():
+    """ Shows all tickers and allows a user to search the list """
+    
+    tickers = Ticker.query.all()
+
+    return render_template('tickers/list.html', tickers=tickers)
+
 
 @app.route('/tickers/search')
 def show_stock_list():
@@ -258,7 +280,7 @@ def edit_post(ticker_name, post_id):
 
     form = EditPost(obj=post)
 
-    if g.user.id != post.user_id:
+    if not g.user:
         flash('Unauthorized Access', 'danger')
         return redirect(f'/tickers/{ticker_name}')
 
@@ -281,7 +303,7 @@ def delete_post(ticker_name, post_id):
 
     post = Post.query.get_or_404(post_id)
 
-    if g.user.id != post.user_id:
+    if not g.user:
         flash('Unauthorized Access')
         return redirect(f'/tickers/{ticker_name}')
 
@@ -293,3 +315,65 @@ def delete_post(ticker_name, post_id):
 
 ##############################################################################
 # General watchlist routes:
+
+@app.route('/watchlists/<ticker_id>/add', methods=['GET', 'POST'])
+def create_or_update_watchlist(ticker_id):
+    """ 
+    Creates a new watchlist if no watchlist is already created and adds stocks to watchlist if the user already has a watchlist 
+    """
+
+    if not g.user.id:
+        flash('Unauthorized Access')
+        return redirect('/tickers')
+
+    form = CreateWatchlist()
+    ticker = Ticker.query.get_or_404(ticker_id)
+    ticker_details = get_watchlist_ticker_data(ticker_id)
+
+    if Watchlist.query.filter_by(user_id=g.user.id).first() == None:
+        if form.validate_on_submit():
+            new_watchlist = Watchlist(name=form.name.data or Watchlist.name.default.arg, ticker=ticker.ticker, open=ticker_details['open'], close=ticker_details['close'], high=ticker_details['high'], low=ticker_details['low'], user_id=g.user.id)
+
+            db.session.add(new_watchlist)
+            db.session.commit()
+            flash(f'Watchlist created!', 'success')
+            return redirect(f'/users/{g.user.id}')
+
+        else:
+            return render_template('watchlists/new.html', form=form)
+    else: 
+        watchlist = Watchlist.query.filter_by(user_id=g.user.id).first()
+        add_ticker_to_watchlist = Watchlist(name=watchlist.name, ticker=ticker.ticker, open=ticker_details['open'], close=ticker_details['close'], high=ticker_details['high'], low=ticker_details['low'], user_id=g.user.id)   
+
+        db.session.add(add_ticker_to_watchlist)
+        db.session.commit()
+        flash(f'{ticker.ticker} added to {watchlist.name}!', 'success')
+        return redirect('/tickers')
+
+
+
+@app.route('/watchlists/<ticker_id>/delete', methods=['POST'])
+def delete_watchlist_ticker(ticker_id):
+    """ Delete a ticker from the watchlist """
+
+    if not g.user.id:
+        flash('Unauthorized Access')
+        return redirect('/')
+
+    watchlist_item = Watchlist.query.get_or_404(ticker_id)
+
+    db.session.delete(watchlist_item)
+    db.session.commit()
+
+    return redirect(f'/users/{g.user.id}')
+
+
+@app.route('/watchlists/delete', methods=['POST'])
+def delete_watchlist():
+    """ Delete user watchlist """
+
+    Watchlist.query.filter_by(user_id=g.user.id).delete()
+
+    db.session.commit()
+
+    return redirect(f'/users/{g.user.id}')

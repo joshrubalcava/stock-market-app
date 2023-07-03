@@ -2,12 +2,21 @@
 
 {% block title %} Stocks List {% endblock %}
 
+{% block stylesheet %} <link rel="stylesheet" href="/static/stylesheets/list.scss"> {% endblock %}
+
 {% block content %}
   <div class="container d-flex flex-column align-items-start">
     <ul class="mt-3 list-group list-group-flush">
+      <form method="GET" class="search-form d-flex border border-primary" action="/tickers/search" role="search">
+        <input class="search-ticker-input me-2 pt-2 form-control shadow-none" type="search" placeholder="Search Company" aria-label="Search" name="ticker" maxlength="5" style="border: none;">
+        <button class="btn btn-default pt-2" type="submit"><span class="fa fa-search"></span></button>
+      </form>
       {% for ticker in tickers %}
         <li class="list-group-item">
-          <a href="/tickers/{{ticker.ticker}}" class="link-primary link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover">{{ticker.ticker}}</a> - {{ticker.name}}
+          <div class="d-flex">
+            <a href="/tickers/{{ticker.ticker}}" class="link-primary link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover">{{ticker.ticker}}</a> - {{ticker.name}}
+            <a href="/watchlists/{{ticker.ticker}}/add"><span class="ms-2 badge text-bg-info">Add to Watchlist</span></a>
+          </div>
         </li>
       {% endfor %}
     </ul>

@@ -2,8 +2,10 @@
 
 {% block title %} Stock Market App {% endblock %}
 
+{% block stylesheet %} <link rel="stylesheet" href="/static/stylesheets/home.scss"> {% endblock %}
+
 {% block content %}
-  <div class=" mt-4 container d-flex justify-content-center flex-wrap">
+  <div class="mt-4 container d-flex justify-content-center flex-wrap">
     {% for index in indices %}
       <div class="mb-3 mx-3 card text-center" style="width: 20rem;">
         {% if index.close|float() > index.open|float() %}
@@ -24,20 +26,47 @@
       </div>
     {% endfor %}
   </div> 
-  <div class="">
-    {% if watchlists %}
-      {% for list in watchlists %}
-        <h1>{{list.name}}</h1>
-        <ul>
-          {% for ticker in user_watchlists %}
-            <li>{{ticker.ticker}}</li>
-          {% endfor %}
-        </ul>
-      {% endfor %}
-    {% else %}
-
-    {% endif %}
-  </div>
+  {% if watchlist %}
+    <div class="mt-4 container d-flex justify-content-center">
+      <div class="w-80 table-responsive">
+        <table class="table table-bordered border-info border-2">
+          {% if watchlist[0] %}
+          <h4 class="mb-3 text-center">{{watchlist[0].name}}</h4>
+          {% endif %}
+          <thead>
+            <tr class="text-center">
+              <th class="col">Ticker Symbol</th>
+              <th class="col">Company</th>
+              <th class="col">Open</th>
+              <th class="col">Close</th>
+              <th class="col">High</th>
+              <th class="col">Low</th>
+              <th class="col">Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for list in watchlist %}
+              <tr class="text-center">
+                <td><a href="/tickers/{{list.ticker}}">{{list.ticker}}</a></td>
+                <td>{{list.tickers.name}}</td>
+                <td>${{list.open}}</td>
+                <td>${{list.close}}</td>
+                <td>${{list.high}}</td>
+                <td>${{list.low}}</td>
+                <td>
+                  <form>
+                    <button class="delete-watchlist-item link-danger" formaction="/watchlists/{{list.id}}/delete" formmethod="POST" style="border: none; background: none;" data-id="{{list.id}}">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>        
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
   <div class="mt-4 container">
     <h1 class="mb-3 text-center">News Articles</h1>
     <div class="row row-cols-1 row-cols-md-3 g-2 justify-content-center">
@@ -62,7 +91,7 @@
                 </footer>
               {% endif %}
             </blockquote>
-            <a href="{{article.url}}" class="mt-2 btn btn-primary">Go to Article</a>
+            <a href="{{article.url}}" target="_blank" class="mt-2 btn btn-primary">Go to Article</a>
           </div>
         </div>
       {% endfor %}

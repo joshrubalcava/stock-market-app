@@ -3,44 +3,104 @@
 {% block title %} {{user.username}} {% endblock %}
 
 {% block content %}
-  <div class="container d-flex flex-column align-items-center">
-    <div class="m-3 d-flex flex-column align-items-center">
-      <img src="{{user.image_url}}" alt="user-profile-picture" class="mb-3 img-thumbnail">
-    </div>
-    <h1>{{user.first_name.capitalize()}} {{user.last_name.capitalize()}}</h1>
-    <p>Username: {{user.username}}</p>
-    <p>Email: {{user.email}}</p>
-    <div class="d-flex justify-content-center">
-      <form action="/users/{{user.id}}/delete" method="POST">
-        <a href="/users/{{user.id}}/edit" class="me-3 btn btn-primary">Edit User Details</a>
-        <button class="btn btn-danger">Delete User</button>
-      </form>
-    </div>
-    <div class="my-4">
-      {% if posts %}
-        <h3 class="text-center">Posts</h3>
-        <div class="text-center">
-          {% for post in posts %}
-            <div class="card-group">
-              <div class="card">
-                <div class="card-body">
-                  <h5 class="card-title"><a href="" class="text-dark">{{post.user.username}}</a></h5>
-                  <h6 class="card-subtitle"><a href="">{{post.ticker}}</a></h6>
-                  <p>{{post.content}}</p>
-                  {% if g.user.id == post.user_id %}
-                    <form action="/tickers/{{post.ticker}}/post/{{post.id}}/delete" method="POST">
-                      <a href="/tickers/{{post.ticker}}/post/{{post.id}}/edit" class="btn btn-primary">Edit Post</a>
-                      <button class="btn btn-danger" type="submit">Delete Post</button>
-                    </form>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          {% endfor %}
+  <div class="container text-center">
+    <div class="row">
+      <div class="mt-4 col">
+        <img src="{{user.image_url}}" alt="user-profile-picture" class="mb-3 img-thumbnail">
+        <h1>{{user.first_name.capitalize()}} {{user.last_name.capitalize()}}</h1>
+        <p>Username: {{user.username}}</p>
+        <p>Email: {{user.email}}</p>
+        <div class="d-flex justify-content-center">
+          <form action="/users/{{user.id}}/delete" method="POST">
+            <a href="/users/{{user.id}}/edit" class="me-3 btn btn-primary">Edit User Details</a>
+            <button class="btn btn-danger">Delete User</button>
+          </form>
         </div>
-      {% else %}
-        <h3>No Posts Yet!</h3>
-      {% endif %}
-    </div>
+      </div>
+      <div class="col">
+        {% if watchlist %}
+          <div class="mt-4 container d-flex justify-content-center">
+            <div class="w-80 table-responsive">
+              <table class="table table-bordered border-info border-2">
+                {% if watchlist[0] %}
+                  <h4 class="mt-4 mb-3 text-center">{{watchlist[0].name}}</h4>
+                {% endif %}
+                <thead>
+                  <tr>
+                    <th class="col">Ticker Symbol</th>
+                    <th class="col">Company</th>
+                    <th class="col">Open</th>
+                    <th class="col">Close</th>
+                    <th class="col">High</th>
+                    <th class="col">Low</th>
+                    <th class="col">Delete</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for list in watchlist %}
+                    <tr class="{{list.id}}">
+                      <td><a href="/tickers/{{list.ticker}}">{{list.ticker}}</a></td>
+                      <td>{{list.tickers.name}}</td>
+                      <td>${{list.open}}</td>
+                      <td>${{list.close}}</td>
+                      <td>${{list.high}}</td>
+                      <td>${{list.low}}</td>
+                      <td>
+                        <form>
+                          <button class="delete-watchlist-item link-danger" formaction="/watchlists/{{list.id}}/delete" formmethod="POST" style="border: none; background: none;" data-id="{{list.id}}">
+                            <i class="fas fa-trash-alt"></i>
+                          </button>
+                        </form>
+                      </td>
+                    </tr>     
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <form action="/watchlists/delete" method="POST">
+            <a class="btn btn-primary">Add Ticker</a>
+            <button class="btn btn-danger" type="submit">Delete Watchlist</button>
+          </form>
+        {% else %}
+          <div class="mt-4 container d-flex justify-content-center">
+            <div class="w-80 table-responsive">
+              <h3>No Watchlist Created</h3>
+              <p>Start a watchlist by searching for a <a class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="/tickers">ticker</a>!</p>
+            </div>
+          </div>
+        {% endif %}
+        <div class="my-4">
+          {% if posts %}
+            <h3 class="text-center">Posts</h3>
+            <div class="text-center">
+              {% for post in posts %}
+                <div class="card-group">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title"><a href="" class="text-dark">{{post.user.username}}</a></h5>
+                      <h6 class="card-subtitle"><a href="">{{post.ticker}}</a></h6>
+                      <p>{{post.content}}</p>
+                      {% if g.user.id == post.user_id %}
+                        <form action="/tickers/{{post.ticker}}/post/{{post.id}}/delete" method="POST">
+                          <a href="/tickers/{{post.ticker}}/post/{{post.id}}/edit" class="btn btn-primary">Edit Post</a>
+                          <button class="btn btn-danger" type="submit">Delete Post</button>
+                        </form>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <h3>No Posts Yet!</h3>
+          {% endif %}
+        </div>
+      </div>
+    </div>    
   </div>
+{% endblock %}
+
+{% block script %}
+  <script src="/static/scripts/show_user.js"></script>
 {% endblock %}

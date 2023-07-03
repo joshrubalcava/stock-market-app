@@ -34,3 +34,8 @@ class EditPost(FlaskForm):
   """ Edit Post """
 
   content = TextAreaField('Enter new post', validators=[Length(min=10)])
+
+class CreateWatchlist(FlaskForm):
+  """ Create new user watchlist """
+  
+  name = StringField('Watchlist Name', validators=[Optional()])
