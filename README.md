@@ -38,7 +38,7 @@ Once you are logged in, you can create your own personal watchlist! If you curre
 
 ### Database Schema
 
-![Database Schema](/schema/db_schema.png "Database Schema")!
+![Database Schema](/schema/db_schema.png "Database Schema")
 
 #### Users Table
 
