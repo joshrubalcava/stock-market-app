@@ -40,6 +40,18 @@ Once you are logged in, you can create your own personal watchlist! If you curre
 
 ![Database Schema](/schema/db_schema.png "Database Schema")!
 
-#### Users Model
+#### Users Table
 
+The users table stores the first name, last name, email, username, hashed password, and image url for a user. The primary key (user ID) is used to link the Users table to the Posts table as well as linking the Users table to the Watchlists table.
 
+#### Posts Table
+
+The posts table stores the post content, timestamp of the post, the user ID (Foreign Key from Users Table), & the ticker symbol (Foreign Key from the Tickers Table).
+
+#### Watchlists Table
+
+The watchlists table stores the name of the watchlist, the ticker symbol (Foreign Key from Tickers Table), the open price, the close price, the high price, and the low price of the stock. The user ID (Foreign Key from Users Table) is also stored to link the Users table to the Watchlist table.
+
+#### Tickers Table
+
+The tickers table stores the ticker symbol, the name of the company, and the exchange it is traded on. The ticker symbol is used as the primary key to link the tickers table to the posts table as well as linking the tickers table to the watchlists table.
