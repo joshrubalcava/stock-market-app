@@ -23,6 +23,28 @@ toolbar = DebugToolbarExtension(app)
 connect_db(app)
 
 
+@app.before_first_request
+def update_main_indices_data():
+
+    main_indices = ['SPX', 'NDAQ', 'DIA']
+
+    global main_indices_data 
+    main_indices_data = get_main_indices(main_indices)
+
+def get_tickers():
+
+
+    Ticker.query.all().delete()
+
+    tickers = get_tickers()
+
+    for ticker in tickers:
+        new_ticker = Ticker(ticker=ticker['ticker'], name=ticker['name'], exchange=ticker['exchange'])
+
+        db.session.add(new_ticker)
+        db.session.commit()
+
+
 @app.before_request
 def add_user_to_g():
     """If we're logged in, add curr user to Flask global."""
@@ -51,18 +73,19 @@ def do_logout():
 def show_home_page():
     """ shows home page """
 
-    main_indices = ['SPX', 'NDAQ', 'DIA']
-
-    indices_data = get_main_indices(main_indices)
+    indices_data = main_indices_data
 
     news = get_news_articles()
 
     if g.user:
-        watchlist = Watchlist.query.filter_by(user_id=g.user.id)
-    else:
-        watchlist = None
+        if Watchlist.query.filter_by(user_id=g.user.id).first() == None:
+            watchlist = None
+        else:
+            watchlist = Watchlist.query.filter_by(user_id=g.user.id)
 
-    return render_template('home.html', indices=indices_data, news=news, watchlist=watchlist)
+        return render_template('home.html', indices=indices_data, news=news, watchlist=watchlist)
+    else: 
+        return render_template('home.html', indices=indices_data, news=news)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -221,7 +244,7 @@ def show_stock_list():
 
     search = request.args['ticker']
 
-    tickers = Ticker.query.filter(Ticker.ticker.like(f'%{search.upper()}%')).all()
+    tickers = Ticker.query.filter(Ticker.ticker.ilike(f'%{search}%') | Ticker.name.ilike(f'%{search}%')).all()
 
     return render_template('tickers/list.html', tickers=tickers)
 

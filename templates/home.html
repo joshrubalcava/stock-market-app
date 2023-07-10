@@ -5,6 +5,9 @@
 {% block stylesheet %} <link rel="stylesheet" href="/static/stylesheets/home.scss"> {% endblock %}
 
 {% block content %}
+  <header class="text-center">
+    <h1>Stock Market App</h1>
+  </header>
   <div class="mt-4 container d-flex justify-content-center flex-wrap">
     {% for index in indices %}
       <div class="mb-3 mx-3 card text-center" style="width: 20rem;">
@@ -31,7 +34,7 @@
       <div class="w-80 table-responsive">
         <table class="table table-bordered border-info border-2">
           {% if watchlist[0] %}
-          <h4 class="mb-3 text-center">{{watchlist[0].name}}</h4>
+            <h4 class="mb-3 text-center">{{watchlist[0].name}}</h4>
           {% endif %}
           <thead>
             <tr class="text-center">
@@ -69,32 +72,38 @@
   {% endif %}
   <div class="mt-4 container">
     <h1 class="mb-3 text-center">News Articles</h1>
-    <div class="row row-cols-1 row-cols-md-3 g-2 justify-content-center">
-      {% for article in news %}
-        <div class="mb-3 mx-3 card text-center" style="width: 20rem;">
-          <div class="card-header bg-dark text-light">{{article.title}}</div>
-          <div class="card-body">
-            <blockquote class="blockquote mb-0">
-              <p>{{article.summary}}</p>
-              {% if article.authors|length == 0 %}
-                <footer class="blockquote-footer">Written By: Anonymous</footer>
-              {% elif article.authors|length >= 1 %}
-                <footer class="blockquote-footer">
-                  Written By:
-                  {% for author in article.authors %}
-                    {% if author == article.authors|last %}
-                      {{author.title()}}
-                    {% else %}
-                      {{author.title(), }}
-                    {% endif %}
-                  {% endfor %}
-                </footer>
-              {% endif %}
-            </blockquote>
-            <a href="{{article.url}}" target="_blank" class="mt-2 btn btn-primary">Go to Article</a>
+    {% if news %}
+      <div class="row row-cols-1 row-cols-md-3 g-2 justify-content-center">
+        {% for article in news %}
+          <div class="mb-3 mx-3 card text-center" style="width: 20rem;">
+            <div class="card-header bg-dark text-light">{{article.title}}</div>
+            <div class="card-body">
+              <blockquote class="blockquote mb-0">
+                <p>{{article.summary}}</p>
+                {% if article.authors|length == 0 %}
+                  <footer class="blockquote-footer">Written By: Anonymous</footer>
+                {% elif article.authors|length >= 1 %}
+                  <footer class="blockquote-footer">
+                    Written By:
+                    {% for author in article.authors %}
+                      {% if author == article.authors|last %}
+                        {{author.title()}}
+                      {% else %}
+                        {{author.title(), }}
+                      {% endif %}
+                    {% endfor %}
+                  </footer>
+                {% endif %}
+              </blockquote>
+              <a href="{{article.url}}" target="_blank" class="mt-2 btn btn-primary">Go to Article</a>
+            </div>
           </div>
-        </div>
-      {% endfor %}
-    </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-center">
+        <h4>No news yet! Please try again in a few minutes.</h4>
+      </div>
+    {% endif %}
   </div>
 {% endblock %}

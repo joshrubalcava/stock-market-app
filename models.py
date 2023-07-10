@@ -99,9 +99,9 @@ class Post(db.Model):
         default=datetime.utcnow(),
     )
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'), nullable=False)
 
-    ticker = db.Column(db.Text, db.ForeignKey('tickers.ticker', ondelete='cascade'))
+    ticker = db.Column(db.Text, db.ForeignKey('tickers.ticker', ondelete='cascade'), nullable=False)
 
     def __repr__(self):
         u = self

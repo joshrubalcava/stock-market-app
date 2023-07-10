@@ -1,75 +1,45 @@
-# Name TBD
+# Stock Market Application
 
-## Goal To Achieve
+The Beginner Stock Market App was built to help beginners gather basic information about stocks as well as relevent news. Most stock market applications that are available are hard for beginners to navigate due to the complexity of the information that is available. I wanted to incorporate just the basic information that would be relevant on a day to day basis in order for beginners to do minimal research to start.
 
-This web app will be designed to achieve a place where users are able to check news related to the US stock market, check for information on selected ticker symbols, and add ticker symbols to their own lists in order for quicker access when the user is signed in. It will show a list of suggested ticker symbols based on the biggest gainers/losers (maybe random tickers selected to display instead) so that if the user does not have symbols in mind, they will be able to start there. Also, there will be a sort of community posts for individual symbols so users can interact with each other.
+To build this application, I used Jinja & Bootstrap for the front-end and used Python & Flask for the back-end. PostgreSQL & SQLAlchemy were also used to store user and stock data.
 
-## Technology Used
+## How to use the Beginner Stock Market Application
 
-Will be using HTML, CSS/Bootstrap, JavaScript for the front-end and python/flask for the back-end. PostgreSQL/SQLAlchemy will be used to store user, stock, and other essential data.
+### User Authentication
 
-## What kind of users will visit this site
+To use the basic functionality of this application, you do not need to be logged in to a user account, but you will be missing out on the ability to create posts for stocks and create a personal watchlist to return to whenever you log back in to the application.
 
-1. Anybody interested in stock market data, news, and posting/reading opinions on the market
-2. Gender: Male and Female
-3. Age: 16 - 50
-4. Device Preference: Desktop & Mobile Browsers
+### Home Page
 
-## What data will be used
+The home page will be openly available with the daily prices for the S&P 500, NASDAQ, and Dow Jones Industrial Average. If you are logged in to your account and have a watchlist created, your watchlist will show on this page as well with the ability to transition to the pages for each individual stock. The most recent news articles will also be shown on this page with the functionality to take you to each of the articles main page. 
 
-- Alpha Vantage
+### Tickers
 
-  - News and Sentiments
+In the navbar, you will have the option to search for ticker symbols or you can click the "Tickers" button on the navbar which will direct you to the full listing of ticker symbols that are available. When you visit the full list of tickers, you can also search for tickers. The list of tickers also allows you to add tickers to your watchlist.
 
-  - Ticker Symbol Information
-    - Daily Prices (Open, High, Low, Close)
+### User Login
 
-- twelvedata
-  - Used to all stocks to the data
-  - Will use the list with polygon.io to get individual stock data
+If you have never signed up for an account, you simply need to click on the "Sign Up" button on the navbar. You will be navigated to a sign up page where you will need to enter your first name, last name, email, a username, and a password. An optional field to fill out will be to provide a URL for your own profile picture. Once you are signed up, you will be redirected to the home page.
 
-- Polygon.io
-  - Get information for individual stocks
+### User Profile Page
 
-## Database Schema Notes
+If you are logged in to your acccount, you will have access to update your username, email and/or profile picture URL by pressing on the "Edit User Details Page. You will also be able to delete your account by Selecting the "Delete User" button. On your profile page, you will have access to your watchlist as well as any posts that you have created for stocks.
 
-- User
-  - user_id, int, primary_key, serialized
-  - first_name, text
-  - last_name, text
-  - profile_image_url, text OR default
-  - username, text, unique
-  - password, text
+### Ticker Posts
 
-- Post
-  - post_id, primary_key, serialized
-  - sentiment, select
-  - content, text
-  - created_at, date
-  - user_id, foreign_key(User.id)
+To share you own opinion on a stock, simply search for a ticker symbol and select the ticker symbol from the list to be directed to the ticker details page. On the ticker details page, you just need to click on the "Add Post" button to be directed to a page where you can enter your post and select "Add Post!".
 
-- UserStockList
-  - user_id, int, primary_key, foreign_key(User.id)
-  - ticker_symbol, text, primary_key
-  - company_name, text
+You are also able to edit you post by selecting the "Edit Post" button on the bottom of your post or you can delete the post entirely by selecting "Delete Post".
 
-## Potential API Issues
+### Watchlist
 
-- Limited API calls
-- May need to find alternatives for additional information due to premium endpoints
+Once you are logged in, you can create your own personal watchlist! If you currently do not have a watchlist created, it is as simple as going to the tickers list and clicking on the "Add to Watchlist" button. You will then be directed to a page to enter the name of your watchlist. You may elect to leave this field blank and you watchlist will be "Watchlist" by default.
 
-## Sensitive information to store
+### Database Schema
 
-- API keys
+![Database Schema](/schema/db_schema.png "Database Schema")!
 
-## App Functionality
+#### Users Model
 
-- User login/logout
-- Add stocks to a private list
-- Add posts to individual stocks or the overall market (only when logged in)
 
-## User Flow
-
-## Features that make it more than just a CRUD app
-
-What are features that would make it more than just a CRUD app?

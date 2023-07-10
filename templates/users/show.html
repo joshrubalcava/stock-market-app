@@ -59,7 +59,7 @@
             </div>
           </div>
           <form action="/watchlists/delete" method="POST">
-            <a class="btn btn-primary">Add Ticker</a>
+            <a class="btn btn-primary" href="/tickers">Add Ticker</a>
             <button class="btn btn-danger" type="submit">Delete Watchlist</button>
           </form>
         {% else %}
@@ -78,7 +78,7 @@
                 <div class="card-group">
                   <div class="card">
                     <div class="card-body">
-                      <h5 class="card-title"><a href="" class="text-dark">{{post.user.username}}</a></h5>
+                      <h5 class="card-title">{{post.user.username}}</h5>
                       <h6 class="card-subtitle"><a href="">{{post.ticker}}</a></h6>
                       <p>{{post.content}}</p>
                       {% if g.user.id == post.user_id %}

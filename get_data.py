@@ -49,38 +49,41 @@ def get_main_indices(main_indices):
 def get_news_articles():
   """ Gets news articles to post for main page """
 
-  NEWS_URL = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&limit=5&apikey={AV_KEY}'
-
   news = []
 
-  resp = requests.get(NEWS_URL)
+  try:
+    NEWS_URL = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&limit=5&apikey={AV_KEY}'
 
-  data = resp.json()
+    resp = requests.get(NEWS_URL)
 
-  feed = data['feed']
+    data = resp.json()
 
-  for article in feed:
-    title = article['title']
-    url = article['url']
-    authors = article['authors']
-    summary = article['summary']
-    banner_img = article['banner_image']
-    source = article['source']
-    topics = article['topics']
-    overall_sentiment = article['overall_sentiment_label']
+    feed = data['feed']
 
-    news.append({
-      'title': title,
-      'url': url,
-      'authors': authors,
-      'summary': summary,
-      'banner_img': banner_img,
-      'source': source,
-      'topics': topics,
-      'overall_sentiment': overall_sentiment
-    })
+    for article in feed:
+      title = article['title']
+      url = article['url']
+      authors = article['authors']
+      summary = article['summary']
+      banner_img = article['banner_image']
+      source = article['source']
+      topics = article['topics']
+      overall_sentiment = article['overall_sentiment_label']
 
-  return news
+      news.append({
+        'title': title,
+        'url': url,
+        'authors': authors,
+        'summary': summary,
+        'banner_img': banner_img,
+        'source': source,
+        'topics': topics,
+        'overall_sentiment': overall_sentiment
+      })
+
+    return news
+  except KeyError:
+    return None
 
 def get_news_for_ticker(ticker):
   """ Gets news articles that include the ticker symbol """
