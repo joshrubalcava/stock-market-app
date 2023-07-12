@@ -1,3 +1,4 @@
+import os
 from flask import Flask, session, render_template, redirect, g, flash, request
 from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, User, Ticker, Post, Watchlist
@@ -10,12 +11,13 @@ CURR_USER_KEY = "curr_user"
 app = Flask(__name__)
 app.app_context().push()
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///stock_market_db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///stock_market_db'
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "postgresql:///ayhjzoui:tFYLTzPs8sO1zorCVHM8c7gbN1lfDjC9@mahmud.db.elephantsql.com/ayhjzoui")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
 app.debug = True
-app.config['SECRET_KEY'] = 'secret_key'
+app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 toolbar = DebugToolbarExtension(app)

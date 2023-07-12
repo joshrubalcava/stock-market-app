@@ -1,5 +1,8 @@
-import requests
-from keys import ALPHA_VANTAGE_KEY as AV_KEY, TWELVE_DATA_KEY as TD_KEY
+import requests, os
+# from keys import ALPHA_VANTAGE_KEY as AV_KEY, TWELVE_DATA_KEY as TD_KEY
+
+AV_KEY = os.environ.get("ALPHA_VANTAGE_KEY")
+TD_KEY = os.environ.get("TWELVE_DATA_KEY")
 
 
 def get_main_indices(main_indices):
