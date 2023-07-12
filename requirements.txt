@@ -6,3 +6,4 @@ Flask_WTF==1.1.1
 Requests==2.31.0
 SQLAlchemy==2.0.16
 WTForms==3.0.1
+gunicorn==20.1.0
