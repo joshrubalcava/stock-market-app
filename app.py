@@ -3,7 +3,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, User, Ticker, Post, Watchlist
 from forms import UserAddForm, UserLoginForm, EditUserForm, AddPost, EditPost, CreateWatchlist
 from sqlalchemy.exc import IntegrityError
-from get_data import get_main_indices, get_news_articles, get_ticker_details, get_news_for_ticker, get_watchlist_ticker_data
+from get_data import get_main_indices, get_news_articles, get_ticker_details, get_news_for_ticker, get_watchlist_ticker_data, get_tickers
 
 CURR_USER_KEY = "curr_user"
 
@@ -22,19 +22,20 @@ toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 
-
 @app.before_first_request
 def update_main_indices_data():
 
-    main_indices = ['SPX', 'NDAQ', 'DIA']
+    main_indices = ['SPX', 'IXIC', 'DJI']
 
     global main_indices_data 
     main_indices_data = get_main_indices(main_indices)
 
-def get_tickers():
+
+@app.before_first_request
+def add_tickers_to_db():
 
 
-    Ticker.query.all().delete()
+    Ticker.query.delete()
 
     tickers = get_tickers()
 
