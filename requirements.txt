@@ -8,3 +8,4 @@ SQLAlchemy==2.0.16
 WTForms==3.0.1
 gunicorn==20.1.0
 email_validator==2.0.0
+psycopg2==2.9.6
