@@ -12,12 +12,12 @@ app = Flask(__name__)
 app.app_context().push()
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///stock_market_db'
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "postgresql:///ayhjzoui:tFYLTzPs8sO1zorCVHM8c7gbN1lfDjC9@mahmud.db.elephantsql.com/ayhjzoui")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "postgresql:///stock_market_db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
-app.debug = True
-app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
+app.debug = False
+app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY", 'secret_key')
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 toolbar = DebugToolbarExtension(app)
@@ -33,19 +33,19 @@ def update_main_indices_data():
     main_indices_data = get_main_indices(main_indices)
 
 
-@app.before_first_request
-def add_tickers_to_db():
+# @app.before_first_request
+# def add_tickers_to_db():
 
 
-    Ticker.query.delete()
+#     Ticker.query.delete()
 
-    tickers = get_tickers()
+#     tickers = get_tickers()
 
-    for ticker in tickers:
-        new_ticker = Ticker(ticker=ticker['ticker'], name=ticker['name'], exchange=ticker['exchange'])
+#     for ticker in tickers:
+#         new_ticker = Ticker(ticker=ticker['ticker'], name=ticker['name'], exchange=ticker['exchange'])
 
-        db.session.add(new_ticker)
-        db.session.commit()
+#         db.session.add(new_ticker)
+#         db.session.commit()
 
 
 @app.before_request

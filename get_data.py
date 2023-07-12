@@ -167,11 +167,12 @@ def get_watchlist_ticker_data(ticker):
   resp = requests.get(ticker_url)
 
   data = resp.json()
+  print(data)
 
-  open = str(round(float(data['values'][0]['open']), 2))
-  high = str(round(float(data['values'][0]['high']), 2))
-  low = str(round(float(data['values'][0]['low']), 2))
-  close = str(round(float(data['values'][0]['close']), 2))
+  open = str(round(float(data["values"][0]['open']), 2))
+  high = str(round(float(data["values"][0]['high']), 2))
+  low = str(round(float(data["values"][0]['low']), 2))
+  close = str(round(float(data["values"][0]['close']), 2))
 
   return {
     'open': open,

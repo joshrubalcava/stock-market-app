@@ -17,13 +17,13 @@ peter = User.signup(first_name='Peter', last_name='Doe', email='peterdoe@yahoo.c
 db.session.add_all([jake, peter])
 db.session.commit()
 
-# tickers = get_tickers()
+tickers = get_tickers()
 
-# for ticker in tickers:
-#   new_ticker = Ticker(ticker=ticker['ticker'], name=ticker['name'], exchange=ticker['exchange'])
+for ticker in tickers:
+  new_ticker = Ticker(ticker=ticker['ticker'], name=ticker['name'], exchange=ticker['exchange'])
 
-#   db.session.add(new_ticker)
-#   db.session.commit()
+  db.session.add(new_ticker)
+  db.session.commit()
 
 post1 = Post(content='First post for apple', user_id=1, ticker='AAPL')
 post2 = Post(content='Second post for apple', user_id=2, ticker='AAPL')
