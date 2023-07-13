@@ -28,43 +28,45 @@
     {% endfor %}
   </div> 
   {% if watchlist %}
-    <div class="mt-4 container d-flex justify-content-center">
-      <div class="w-80 table-responsive">
-        <table class="table table-bordered border-info border-2">
-          {% if watchlist[0] %}
-            <h4 class="mb-3 text-center">{{watchlist[0].name}}</h4>
-          {% endif %}
-          <thead>
-            <tr class="text-center">
-              <th class="col">Ticker Symbol</th>
-              <th class="col">Company</th>
-              <th class="col">Open</th>
-              <th class="col">Close</th>
-              <th class="col">High</th>
-              <th class="col">Low</th>
-              <th class="col">Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for list in watchlist %}
+    <div class="watchlist-container d-flex flex-column align-items-center">
+      <div class="mt-4 container d-flex justify-content-center">
+        <div class="w-80 table-responsive">
+          <table class="table table-bordered border-info border-2">
+            {% if watchlist[0] %}
+              <h4 class="mb-3 text-center">{{watchlist[0].name}}</h4>
+            {% endif %}
+            <thead>
               <tr class="text-center">
-                <td><a href="/tickers/{{list.ticker}}">{{list.ticker}}</a></td>
-                <td>{{list.tickers.name}}</td>
-                <td>${{list.open}}</td>
-                <td>${{list.close}}</td>
-                <td>${{list.high}}</td>
-                <td>${{list.low}}</td>
-                <td>
-                  <form>
-                    <button class="delete-watchlist-item link-danger" formaction="/watchlists/{{list.id}}/delete" formmethod="POST" style="border: none; background: none;" data-id="{{list.id}}">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </form>
-                </td>
-              </tr>        
-            {% endfor %}
-          </tbody>
-        </table>
+                <th class="col">Ticker Symbol</th>
+                <th class="col">Company</th>
+                <th class="col">Open</th>
+                <th class="col">Close</th>
+                <th class="col">High</th>
+                <th class="col">Low</th>
+                <th class="col">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for list in watchlist %}
+                <tr class="text-center" data-row-id="{{list.id}}">
+                  <td><a href="/tickers/{{list.ticker}}">{{list.ticker}}</a></td>
+                  <td>{{list.tickers.name}}</td>
+                  <td>${{list.open}}</td>
+                  <td>${{list.close}}</td>
+                  <td>${{list.high}}</td>
+                  <td>${{list.low}}</td>
+                  <td>
+                    <button class="fas fa-trash-alt delete-watchlist-item link-danger" style="border: none; background: none;" data-id="{{list.id}}"></button>
+                  </td>
+                </tr>        
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="d-flex justify-content-center">
+        <a class="btn btn-primary me-3" href="/tickers">Add Ticker</a>
+        <button class="delete-watchlist-button btn btn-danger" data-route="home">Delete Watchlist</button>
       </div>
     </div>
   {% endif %}

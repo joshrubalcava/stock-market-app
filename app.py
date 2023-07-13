@@ -1,5 +1,5 @@
 import os
-from flask import Flask, session, render_template, redirect, g, flash, request
+from flask import Flask, session, render_template, redirect, g, flash, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, User, Ticker, Post, Watchlist
 from forms import UserAddForm, UserLoginForm, EditUserForm, AddPost, EditPost, CreateWatchlist
@@ -323,20 +323,25 @@ def edit_post(ticker_name, post_id):
         return render_template('/tickers/edit_post.html', form=form, ticker=ticker)
 
 
-@app.route('/tickers/<ticker_name>/post/<int:post_id>/delete', methods=['POST'])
+@app.route('/tickers/<ticker_name>/post/<int:post_id>/delete', methods=['DELETE'])
 def delete_post(ticker_name, post_id):
     """ Handles deleting a user post """
 
-    post = Post.query.get_or_404(post_id)
-
     if not g.user:
-        flash('Unauthorized Access')
+        flash('Please login or sign up to create a post', 'danger')
         return redirect(f'/tickers/{ticker_name}')
+
+    post = Post.query.get_or_404(post_id)
 
     db.session.delete(post)
     db.session.commit()
 
-    return redirect(f'/tickers/{ticker_name}')
+    user_posts = Post.query.filter_by(user_id=g.user.id)
+
+    if user_posts.first():
+        return jsonify(posts=True)
+    else:
+        return jsonify(posts=None)
 
 
 ##############################################################################
@@ -348,8 +353,8 @@ def create_or_update_watchlist(ticker_id):
     Creates a new watchlist if no watchlist is already created and adds stocks to watchlist if the user already has a watchlist 
     """
 
-    if not g.user.id:
-        flash('Unauthorized Access')
+    if not g.user:
+        flash(f'Please login or sign up to add {ticker_id} to watchlist', 'danger')
         return redirect('/tickers')
 
     form = CreateWatchlist()
@@ -378,12 +383,12 @@ def create_or_update_watchlist(ticker_id):
 
 
 
-@app.route('/watchlists/<ticker_id>/delete', methods=['POST'])
+@app.route('/watchlists/<ticker_id>/delete', methods=['DELETE'])
 def delete_watchlist_ticker(ticker_id):
     """ Delete a ticker from the watchlist """
 
     if not g.user.id:
-        flash('Unauthorized Access')
+        flash('Unauthorized Access', 'danger')
         return redirect('/')
 
     watchlist_item = Watchlist.query.get_or_404(ticker_id)
@@ -391,15 +396,24 @@ def delete_watchlist_ticker(ticker_id):
     db.session.delete(watchlist_item)
     db.session.commit()
 
-    return redirect(f'/users/{g.user.id}')
+    user_watchlist = Watchlist.query.filter_by(user_id=g.user.id)
+
+    if user_watchlist.first():
+        return jsonify(watchlist=user_watchlist.all())
+    else:
+        return jsonify(watchlist=None)
 
 
-@app.route('/watchlists/delete', methods=['POST'])
+@app.route('/watchlists/delete', methods=['DELETE'])
 def delete_watchlist():
     """ Delete user watchlist """
+
+    if not g.user.id:
+        flash('Unauthorized Access', 'danger')
+        return redirect('/')
 
     Watchlist.query.filter_by(user_id=g.user.id).delete()
 
     db.session.commit()
 
-    return redirect(f'/users/{g.user.id}')
+    return jsonify(watchlist=None)
