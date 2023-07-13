@@ -4,7 +4,7 @@ const deletePost = async (evt) => {
   let $postId = $(evt.target).data('id');
   let $ticker = $(evt.target).data('ticker');
   let res = await axios.delete(`/tickers/${$ticker}/post/${$postId}/delete`);
-  console.log(res.data);
+
   let $postsContainer = $('.posts-container');
 
   if (res.data.posts === null) {
@@ -16,8 +16,8 @@ const deletePost = async (evt) => {
       $postsContainer.append('<div class="posts-container"><h3>No Posts Yet!</h3></div>');
     }
   } else {
-    $postContainer = $(`.${$postId}`);
-    $postContainer.remove();
+    $postsContainer = $(`.${$postId}`);
+    $postsContainer.remove();
   }
 }
 let $deletePostButton = $('.delete-post-button');
